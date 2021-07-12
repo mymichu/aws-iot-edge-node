@@ -1,0 +1,4 @@
+#yocto
+build
+.sstate-cache
+.downloads

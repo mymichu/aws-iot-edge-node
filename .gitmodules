@@ -1,0 +1,24 @@
+[submodule "layers/poky"]
+	path = layers/poky
+	url = git://git.yoctoproject.org/poky
+[submodule "layers/meta-toradex-nxp"]
+	path = layers/meta-toradex-nxp
+	url = git://git.toradex.com/meta-toradex-nxp.git
+[submodule "layers/meta-toradex-bsp-common"]
+	path = layers/meta-toradex-bsp-common
+	url = git://git.toradex.com/meta-toradex-bsp-common.git
+[submodule "layers/meta-freescale-3rdparty"]
+	path = layers/meta-freescale-3rdparty
+	url = git@github.com:Freescale/meta-freescale-3rdparty.git
+[submodule "layers/meta-freescale"]
+	path = layers/meta-freescale
+	url = git@github.com:Freescale/meta-freescale.git
+[submodule "layers/meta-aws"]
+	path = layers/meta-aws
+	url = git@github.com:aws/meta-aws.git
+[submodule "layers/meta-openembedded"]
+	path = layers/meta-openembedded
+	url = git@github.com:openembedded/meta-openembedded.git
+[submodule "layers/meta-freescale-distro"]
+	path = layers/meta-freescale-distro
+	url = git@github.com:Freescale/meta-freescale-distro.git
