@@ -6,7 +6,7 @@ DESCRIPTION = "TODO"
 LICENSE = "MIT"
 
 #Prefix to the resulting deployable tarball name
-export IMAGE_BASENAME = "iot-edge"
+export IMAGE_BASENAME = "iot-edge-node"
 MACHINE_NAME ?= "${MACHINE}"
 IMAGE_NAME = "${MACHINE_NAME}_${IMAGE_BASENAME}"
 
