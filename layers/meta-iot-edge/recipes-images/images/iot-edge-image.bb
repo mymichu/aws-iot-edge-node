@@ -24,9 +24,6 @@ add_rootfs_version () {
 ROOTFS_POSTPROCESS_COMMAND += " add_rootfs_version;"
 
 IMAGE_LINGUAS = "en-us"
-#IMAGE_LINGUAS = "de-de fr-fr en-gb en-us pt-br es-es kn-in ml-in ta-in"
-
-CONMANPKGS ?= "connman connman-plugin-loopback connman-plugin-ethernet connman-plugin-wifi connman-client"
 
 IMAGE_INSTALL += " \
     packagegroup-boot \
@@ -57,6 +54,7 @@ IMAGE_INSTALL += " \
     linux-firmware-rtl8192cu \
     linux-firmware-rtl8188   \
     udev-extraconf \
-    ${CONMANPKGS} \
+    connman \
+    greengrass \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)} \
 "
