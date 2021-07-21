@@ -25,6 +25,8 @@ ROOTFS_POSTPROCESS_COMMAND += " add_rootfs_version;"
 
 IMAGE_LINGUAS = "en-us"
 
+IMAGE_FEATURES+="read-only-rootfs"
+
 IMAGE_INSTALL += " \
     packagegroup-boot \
     packagegroup-basic \

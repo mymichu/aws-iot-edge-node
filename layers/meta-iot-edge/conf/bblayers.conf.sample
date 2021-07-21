@@ -14,6 +14,7 @@ BBLAYERS ?= " \
   ${TOPDIR}/../layers/meta-openembedded/meta-gnome \
   ${TOPDIR}/../layers/meta-openembedded/meta-multimedia \
   ${TOPDIR}/../layers/meta-openembedded/meta-networking \
+  ${TOPDIR}/../layers/meta-openembedded/meta-initramfs\
   ${TOPDIR}/../layers/meta-freescale \
   ${TOPDIR}/../layers/meta-freescale-3rdparty \
   ${TOPDIR}/../layers/meta-freescale-distro \
