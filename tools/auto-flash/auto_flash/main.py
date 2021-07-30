@@ -46,6 +46,6 @@ if __name__ == "__main__":
     serial = serial.Serial(args.device, timeout=2, baudrate=115200)
     print(serial.name)
     enter_uboot(serial)
-    boot_ram(serial, "192.100.10.1", "192.100.10.2", "fitImage-image-initramfs-iot-edge--5.4.77+gitAUTOINC+a2e5dc8022-r0-iot-edge-20210730054435.bin")
+    boot_ram(serial, "192.100.10.1", "192.100.10.2", "fitImage-image-initramfs-iot-edge.bin")
 
 
