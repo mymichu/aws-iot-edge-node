@@ -29,4 +29,5 @@ def setup(c, buildfolder='build'):
     
 @task
 def build(c, image="iot-edge-image"):
+    c.run(f'bash -c "source {current_file_dir}/../build/setup-env && bitbake image-initramfs"')
     c.run(f'bash -c "source {current_file_dir}/../build/setup-env && bitbake {image}"')
