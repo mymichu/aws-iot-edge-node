@@ -276,3 +276,5 @@ PACKAGECONFIG_append_pn-qemu-system-native = " sdl"
 # this doesn't mean anything to you.
 CONF_VERSION = "1"
 ACCEPT_FSL_EULA = "1"
+
+CONNECTIVITY_CHECK_URIS = "http://www.google.com"
