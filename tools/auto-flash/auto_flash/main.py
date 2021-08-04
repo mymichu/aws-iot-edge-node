@@ -1,7 +1,9 @@
 import serial
-import time
+
 import argparse
 import auto_flash
+import api
+import config
 
 
 def get_args():
@@ -11,66 +13,11 @@ def get_args():
     return parser.parse_args()
 
 
-def enter_uboot(tty):
-    if not tty.is_open:
-        tty.open()
-    in_uboot = False
-    timeout = time.time() + 60 * 5
-    print("Wait for reset Board.")
-    while not in_uboot:
-        tty.write("m".encode())  # write a string
-        in_uboot = wait_for_acknowledge(tty, 0.01, "Colibri iMX6 #")
-        if time.time() > timeout:
-            raise RuntimeError("Unable to enter U-Boot console")
-    print("U-Boot console entered.")
-    tty.close()
-
-
-def wait_for_acknowledge(tty, timeout_sec, acknowldge_message, only_ack=False):
-    timeout = time.time() + timeout_sec
-    feedback_buffer = ""
-    while True:
-        feedback_buffer += tty.read(1).decode('UTF-8')
-        if only_ack:
-            if acknowldge_message == feedback_buffer:
-                return True
-        else:
-            if acknowldge_message in feedback_buffer:
-                return True
-        if time.time() > timeout:
-            return False
-        if len(feedback_buffer) > 200000000:
-            raise BufferError("Serial rx buffer to long")
-
-
-
-def write_command(tty, command):
-    tty.write(command.encode())
-    if wait_for_acknowledge(tty, 0.5, command, only_ack=True):
-        raise RuntimeError("Not able to write command to serial")
-
-
-def boot_ram(tty, serverip, ip, fit_binary):
-    print("Download From TFTP & Boot from RAM.")
-    if not tty.is_open:
-        tty.open()
-    tty.flush()
-    tty.write("\n".encode())
-    write_command(tty, f"setenv ipaddr {ip} \n")
-    write_command(tty, f"setenv serverip {serverip} \n")
-    tftpcmd = "tftp ${loadaddr}" + f" {fit_binary}" + "\n"
-    write_command(tty, tftpcmd)
-    if wait_for_acknowledge(tty, 60, "done"):
-        print("FIT image downloaded from tftp.")
-        write_command(tty,"bootm ${loadaddr} \n")
-        if wait_for_acknowledge(tty, 60, "Run /init as init process"):
-            print("FIT image started.")
-    tty.close()
-
-
 if __name__ == "__main__":
     args = get_args()
-    serial = serial.Serial(args.device, timeout=5, baudrate=115200, writeTimeout=1)
-    print(serial.name)
-    enter_uboot(serial)
-    boot_ram(serial, "192.100.10.1", "192.100.10.2", "fitImage-image-initramfs-iot-edge.bin")
+    #serial = serial.Serial(args.device, timeout=5, baudrate=115200, writeTimeout=1)
+    #print(serial.name)
+    #api.enter_uboot(serial)
+    #api.boot_ram(serial, "192.100.10.1", "192.100.10.2", "fitImage-image-initramfs-iot-edge.bin")
+    cfg = config.Settings()
+    cfg.print_part()
