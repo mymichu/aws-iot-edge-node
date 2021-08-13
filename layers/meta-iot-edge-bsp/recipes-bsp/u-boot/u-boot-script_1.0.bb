@@ -30,7 +30,11 @@ do_install() {
 }
 
 do_deploy() {
+    rm -f ${DEPLOYDIR}/boot.scr
+    rm -f ${DEPLOYDIR}/boot.scr-${MACHINE}
     install -Dm 0644 ${D}/boot.scr ${DEPLOYDIR}/boot.scr
+    cd ${DEPLOYDIR}
+    ln -sf boot.scr boot.scr-${MACHINE}
 }
 
 addtask deploy after do_install before do_build
