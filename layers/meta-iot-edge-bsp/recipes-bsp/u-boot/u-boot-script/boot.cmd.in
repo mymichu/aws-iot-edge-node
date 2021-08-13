@@ -1,0 +1,7 @@
+setenv devtype mmc
+env set setupargs_set 'env set setupargs fec_mac=00:14:2d:4f:f3:d5 consoleblank=0 no_console_suspend=1 console=tty1 console=ttymxc0,115200n8'
+env set emmcargs_set 'env set emmcargs root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait'
+env set bootargs_set 'env set bootargs ${defargs} ${setupargs} ${emmcargs}'
+env set loadkernel 'load ${devtype} ${devnum}:${distro_bootpart} ${loadaddr} fitImage-iot-edge.bin'
+env set bootcmd 'run emmcargs_set && run setupargs_set && run bootargs_set && run loadkernel && bootm ${loadaddr}'
+run bootcmd
