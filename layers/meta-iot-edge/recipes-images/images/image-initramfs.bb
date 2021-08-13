@@ -16,6 +16,8 @@ add_symlink_image (){
 PACKAGE_INSTALL = "initramfs-debug\
     busybox\
     base-passwd \
+    dosfstools \
+    e2fsprogs-mke2fs \
     parted \
     wget \
     tftp-hpa \
@@ -26,8 +28,11 @@ PACKAGE_INSTALL = "initramfs-debug\
     pv \
     mmc-utils"
 
+
 # Do not pollute the initrd image with rootfs features
 IMAGE_FEATURES = ""
+
+MACHINE_FEATURES += "vfat"
 
 IMAGE_LINGUAS = ""
 
