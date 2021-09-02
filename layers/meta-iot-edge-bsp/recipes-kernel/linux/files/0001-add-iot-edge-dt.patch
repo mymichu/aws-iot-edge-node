@@ -1,0 +1,24 @@
+From 782e9f481968a635017dbe4695bcf2f10adde238 Mon Sep 17 00:00:00 2001
+From: Michel Meyer <meyer_michel@outlook.com>
+Date: Thu, 2 Sep 2021 21:15:05 +0200
+Subject: [PATCH 1/1] add iot edge dt
+
+---
+ arch/arm/boot/dts/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index 26a39ed58a72..2d13a5c0e1f8 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -402,6 +402,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
+ 	imx6dl-aristainetos2_4.dtb \
+ 	imx6dl-aristainetos2_7.dtb \
+ 	imx6dl-colibri-eval-v3.dtb \
++	imx6dl-colibri-iot-edge.dtb \
+ 	imx6dl-cubox-i.dtb \
+ 	imx6dl-cubox-i-emmc-som-v15.dtb \
+ 	imx6dl-cubox-i-som-v15.dtb \
+-- 
+2.25.1
+

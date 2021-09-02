@@ -23,9 +23,12 @@ add_rootfs_version () {
 # add the rootfs version to the welcome banner
 ROOTFS_POSTPROCESS_COMMAND += " add_rootfs_version;"
 
+#CONMANPKGS ?= "connman connman-plugin-loopback connman-plugin-ethernet connman-plugin-wifi connman-client"
+
 IMAGE_LINGUAS = "en-us"
 
-IMAGE_FEATURES+="read-only-rootfs"
+#IMAGE_FEATURES+="read-only-rootfs"
+
 
 IMAGE_INSTALL += " \
     packagegroup-boot \
@@ -42,7 +45,6 @@ IMAGE_INSTALL += " \
     avahi-autoipd \
     curl \
     linuxptp \
-    nfs-utils-client \
     ppp \
     ptpd \
     linux-firmware-ath10k    \
@@ -56,7 +58,8 @@ IMAGE_INSTALL += " \
     linux-firmware-rtl8192cu \
     linux-firmware-rtl8188   \
     udev-extraconf \
-    connman \
+    wpa-supplicant \
     greengrass \
+    networkmanager\
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)} \
 "

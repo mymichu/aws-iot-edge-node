@@ -91,7 +91,7 @@ DISTRO ?= "poky"
 # source control systems. This is just mentioned here as an example, its not
 # useful to most new users.
 # DISTRO ?= "poky-bleeding"
-DISTRO_FEATURES = "systemd"
+DISTRO_FEATURES = "systemd wifi"
 VIRTUAL-RUNTIME_init_manager = "systemd" 
 DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit" 
 VIRTUAL-RUNTIME_initscripts = "1"
@@ -278,3 +278,5 @@ CONF_VERSION = "1"
 ACCEPT_FSL_EULA = "1"
 
 CONNECTIVITY_CHECK_URIS = "http://www.google.com"
+
+PACKAGECONFIG_append_pn-networkmanager = " wifi"
