@@ -105,16 +105,10 @@
 	pwmleds {
 		compatible = "pwm-leds";
 
-		pwm1 {
-			label = "pwm1";
-			pwms = <&pwm1 0 50000>;
-			max-brightness = <255>;
-		};
-
-		blue {
-			label = "blue";
-			max-brightness = <255>;
+		pwmb {
+			label = "pwmb";
 			pwms = <&pwm2 0 50000>;
+			max-brightness = <255>;
 		};
 	};
 };
@@ -123,20 +117,10 @@
 &ecspi4 {
 	status = "okay";
 
-	mcp251x0: mcp251x@0 {
-		compatible = "microchip,mcp2515";
-		reg = <0>;
-		clocks = <&clk16m>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <27 0x2>;
-		spi-max-frequency = <10000000>;
-		status = "disabled";
-	};
-
 	spidev0: spidev@0 {
 		compatible = "toradex,evalspi";
 		reg = <0>;
-		spi-max-frequency = <23000000>;
+		spi-max-frequency = <5000000>;
 		status = "okay";
 	};
 };

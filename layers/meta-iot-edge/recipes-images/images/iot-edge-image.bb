@@ -60,6 +60,8 @@ IMAGE_INSTALL += " \
     udev-extraconf \
     wpa-supplicant \
     greengrass \
-    networkmanager\
+    networkmanager \
+    libnfc \
+    i2c-tools \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)} \
 "
