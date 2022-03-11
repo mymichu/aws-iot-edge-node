@@ -1,147 +1,77 @@
-from codecs import ignore_errors
-import time
+import configuration
 import serial
-import config
 from typing import List
 
-def enter_uboot(tty: serial):
-    if not tty.is_open:
-        tty.open()
-    in_uboot = False
-    timeout = time.time() + 60 * 5
-    print("Wait for reset Board.")
-    while not in_uboot:
-        tty.write("m \n".encode())  # write a string
-        tty.flush()
-        in_uboot = _wait_for_acknowledge(tty, 0.01, "Colibri iMX6 #")
-        if time.time() > timeout:
-            raise RuntimeError("Unable to enter U-Boot console")
-    print("U-Boot console entered.")
-    tty.close()
+from auto_flash.partition import Partition, Format, Partitioner
+from auto_flash.utility import Utility
+from auto_flash.tty import TTY
+from auto_flash.uboot import UBoot
+from auto_flash.configuration import Settings as Json_Settings
 
 
-def _wait_for_acknowledge(tty: serial, timeout_sec: float, acknowledge_message: str, only_ack: bool = False):
-    inTime = time.time();
-    timeout =  inTime + timeout_sec
-    feedback_buffer=""
-    acknowledge_message=acknowledge_message.strip();
-    acknowledge_message=acknowledge_message.replace(" ", "")
-    while True:    
-        feedback_buffer +=  tty.readline().decode('UTF-8', errors="ignore").strip()
-        feedback_buffer=feedback_buffer.replace(" ", "")
-        current_time=time.time();
-        if only_ack == True:
-            if acknowledge_message == feedback_buffer:
-                return True
-        else:
-            if acknowledge_message in feedback_buffer:
-                return True
-        if current_time > timeout:
-            print(f"Timeout {inTime} vs {timeout} vs {timeout_sec}: {acknowledge_message} vs {feedback_buffer}")
-            return False
-        if len(feedback_buffer) > 200000000:
-            print(f"blabal {feedback_buffer}")
-            raise BufferError("Serial rx buffer to long")
+class API:
+    tty_interface: TTY
+    configuration: Json_Settings
+    linux_utility = Utility
 
-def _write_command(tty: serial, command: str, ignore_check=False):
-    command_enter=command+"\n"
-    tty.write(command_enter.encode())
-    tty.flush()
-    if ignore_check ==False:
-        if _wait_for_acknowledge(tty, 5.0, command, only_ack=False) == False:
-            raise RuntimeError("Not able to write command to serial")
+    def __init__(self, device: str, baudrate: int, configuration_path: str):
+        self.tty_interface = TTY(device, baudrate)
+        self.configuration = Json_Settings(configuration_path)
+        self.linux_utility = Utility(self.tty_interface)
 
+    def _start_ram_image(self):
+        uboot = UBoot(self.tty_interface)
+        uboot.enter_uboot()
+        uboot.boot_ram(self.configuration.config.serverip, self.configuration.config.ip, self.configuration.config.ramimage)
 
-def boot_ram(tty: serial, serverip: str, ip: str, fit_binary: str):
-    print("Download From TFTP & Boot from RAM.")
-    if not tty.is_open:
-        tty.open()
-    tty.flush()
-    tty.write("\n".encode())
-    _write_command(tty, f"setenv ipaddr {ip}")
-    _write_command(tty, f"setenv serverip {serverip}")
-    tftpcmd = "tftp ${loadaddr}" + f" {fit_binary}" 
-    _write_command(tty, tftpcmd)
-    if _wait_for_acknowledge(tty, 60, "done") == True:
-        print("FIT image downloaded from tftp.")
-        _write_command(tty, "bootm ${loadaddr}")
-        if _wait_for_acknowledge(tty, 60, "Run /init as init process") == True:
-            time.sleep(5)
-            print("FIT image started.")
-        else:
-            raise("Not able to start RAM Image!")
-    else:
-            raise("Not able to download RAM Image!")
-    tty.close()
+    def _configure_device(self):
+        self.linux_utility.set_ip(self.configuration.config.ip, self.configuration.config.mask)
 
-def partition_device(tty: serial, serverip: str, ip: str, mask: str, partitions: List[config.Partition]):
-    if not tty.is_open:
-        tty.open()
-    tty.flush()
-    print("Set IP on RAM Disk")
-    _write_command(tty, f"ifconfig eth0 {ip} netmask {mask} up")
-    _wait_for_acknowledge(tty, 30, "link becomes ready")
-    _write_command(tty, f"ifconfig")
-    if _wait_for_acknowledge(tty, 10, f"{ip}"):
-        print("Ethernet is configured")
-    _write_command(tty,f"parted  -a optimal /dev/mmcblk1 -s mklabel msdos")
-    size_of_last_mb = 0
-    sorted_partition = sorted(partitions)
-    for partition in sorted_partition:
-        partition_command=f"parted  -a optimal /dev/mmcblk1 -s mkpart primary {partition.format} "
-        if size_of_last_mb == 0:
-            partition_command+=f" 0%" 
-        else:
-            partition_command+=f" {size_of_last_mb}MB"
-        size_of_last_mb = partition.size_mb
-        if partition.fill:
-            partition_command += f" 100%"
-        else:
-            partition_command += f" {partition.size_mb}MB"
-        _write_command(tty,partition_command)
-        if partition.primary:
-            _write_command(tty,f"parted -a optimal /dev/mmcblk1 -s set {partition.id} boot on")
-    for partition in sorted_partition:
-        if "fat" in partition.format:
-            _write_command(tty,f"yes | mkfs.vfat /dev/mmcblk1p{partition.id}")
-            if _wait_for_acknowledge(tty,60,"mkfs.fat"):
-                print("FAT Formatted")
-        if "ext4" in partition.format:
-            _write_command(tty,f"yes | mkfs.ext4 /dev/mmcblk1p{partition.id}")
-            if _wait_for_acknowledge(tty,60,"done"):
-                print("EXT4 Formatted")
-    
-    for partition in sorted_partition:
-        if partition.files.count:
-            _write_command(tty,f"mkdir -p /mnt/dir{partition.id}")
-            _write_command(tty,f'mount /dev/mmcblk1p{partition.id} /mnt/dir{partition.id} && echo "DONE"')
-            if _wait_for_acknowledge(tty,60,f"DONE")==False:
-                raise "Not able to mount device"
-            _write_command(tty,f'cd /mnt/dir{partition.id} && echo "DONE"')
-            if _wait_for_acknowledge(tty,60,f"DONE")==False:
-                raise "Change Directory"
+    def _flash_image(self):
+        sorted_partition = sorted(self.configuration.config.partitions)
+        part_partitions: List[Partition] = API.convert_partition_type(sorted_partition)
+        partitioner = Partitioner(self.tty_interface)
+        partitioner.create_partition_table(part_partitions, "/dev/mmcblk1")
+        partition_id: int = 1
+        for partition in sorted_partition:
+            mounted_device = f"/dev/mmcblk1p{partition_id}"
+            mounted_folder = f"/mnt/dir{partition_id}"
+            partitioner.format_device(mounted_device, self._convert_format(partition.format))
+            self.linux_utility.mount_device_force(mounted_device, mounted_folder)
+            partition_id = partition_id + 1
+            self.linux_utility.change_director(mounted_folder)
             for file in partition.files:
-                print(f"Download {file}")
-                _write_command(tty,f'tftp {serverip} -c get {file} && echo "DONE"')
-                time.sleep(1)
-                if _wait_for_acknowledge(tty,120,f"DONE")==True:
-                    print(f"File downloaded {file}")
-                print(f"Check if file was correctly downladed {file}")
-                _write_command(tty,f"stat {file}")
-                if _wait_for_acknowledge(tty,60,"regular file") == True:
-                    print(f"File was correctly downloaded {file}")
-                else:
-                    raise "Download was not succesfull"
-                if partition.extract == True:
-                    print(f"Unpacking {file}")
-                    _write_command(tty,f'tar -xf {file} && echo "DONE" ')
-                    if _wait_for_acknowledge(tty,18000,"DONE") == True:
-                        print(f"Unpackecd {file}")
-                        _write_command(tty,f"rm -rf {file}")
-                    else:
-                        raise f"Was not able to unpack {file}"
-            _write_command(tty,f"cd /")
-            
-    print("Flashed reset the device")
-    tty.close()
-    
+                self.linux_utility.tftp_download(self.configuration.config.serverip, file.name)
+                if file.extract:
+                    self.linux_utility.untar(file.name)
+        print("Flashed reset the device")
+
+    def run(self):
+        self._start_ram_image()
+        self._configure_device()
+        self._flash_image()
+
+    @staticmethod
+    def convert_partition_type(in_partitions: List[configuration.Partition]) -> List[Partition]:
+        part_partitions: List[Partition]=[]
+        size_of_last_mb = 0
+        for config_partition in in_partitions:
+            part_partition: Partition = Partition()
+            part_partition.fill = config_partition.fill
+            part_partition.start_mb = size_of_last_mb
+            part_partition.size_mb = config_partition.size_mb
+            part_partition.primary = config_partition.primary
+            part_partition.format = API._convert_format(config_partition.format)
+            part_partitions.append(part_partition)
+            size_of_last_mb = config_partition.size_mb
+        return part_partitions
+
+    @staticmethod
+    def _convert_format(format_str: str) -> Format:
+        if "fat32" == format_str:
+            return Format.FAT
+        elif "ext4" == format_str:
+            return Format.EXT4
+        else:
+            raise "ONLY ext4 and fat32 format is supported"
+

@@ -1,19 +1,36 @@
 {
+  "ip": "192.100.10.2",
+  "mask": "255.255.255.0",
+  "serverip": "192.100.10.1",
+  "ramimage": "fitImage-image-initramfs-iot-edge.bin",
   "partitions": [
     {
       "id": 1,
       "size_mb": 100,
       "format": "fat32",
       "primary": true,
-      "files": ["boot.scr","fitImage-iot-edge.bin"]
+      "files": [
+        {
+          "name": "boot.scr",
+          "extract": false
+        },
+        {
+          "name": "fitImage-iot-edge.bin",
+          "extract": false
+        }
+      ]
     },
     {
       "id": 2,
       "fill": true,
       "format": "ext4",
       "primary": false,
-      "files": ["Colibri-iMX6_iot-edge-node.rootfs.tar.xz"],
-      "extract": true
+      "files": [
+        {
+          "name": "Colibri-iMX6_iot-edge-node.rootfs.tar.xz",
+          "extract": true
+        }
+      ]
     }
   ]
 }

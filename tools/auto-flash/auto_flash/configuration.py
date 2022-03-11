@@ -6,14 +6,24 @@ from dataclasses_json import dataclass_json
 
 @dataclass_json
 @dataclass(frozen=True, repr=True)
+class File:
+    name: str
+    extract: bool
+
+    def __repr__(self):
+        rep_string = f"name: {self.name} -- extract: {self.extract} "
+        return rep_string
+
+
+@dataclass_json
+@dataclass(frozen=True, repr=True)
 class Partition:
     id: int
     format: str
     size_mb: int = 0
     fill: bool = False
     primary: bool = False
-    extract: bool = False
-    files: str = ""
+    files: List[File] = None
 
     def __repr__(self):
         rep_string = f"id: {self.id} -- format: {self.format} "
@@ -22,7 +32,7 @@ class Partition:
             rep_string += f" -- size_mb: 100%"
         else:
             rep_string += f" -- size_mb: {self.size_mb}"
-        if self.files :
+        if self.files:
             rep_string += f" -- files: {self.files}"
         if self.extract:
             rep_string += f" -- extract: {self.extract}"
@@ -38,6 +48,10 @@ class Partition:
 @dataclass_json
 @dataclass(frozen=True)
 class Config:
+    ip: str
+    mask: str
+    serverip: str
+    ramimage: str
     partitions: List[Partition]
 
 
@@ -54,6 +68,11 @@ class Settings:
             raw_data = json_file.read()
         self.config = Config.from_json(raw_data)
 
+    def print_setting(self):
+        print(f"SERVER-IP:{self.config.serverip}")
+        print(f"IP:{self.config.ip}")
+        print(f"Mask:{self.config.mask}")
+        
     def print_part(self):
         sorted_partition = sorted(self.config.partitions)
         for partition in sorted_partition:
