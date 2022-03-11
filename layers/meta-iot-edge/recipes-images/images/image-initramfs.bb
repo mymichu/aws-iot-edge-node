@@ -26,8 +26,8 @@ PACKAGE_INSTALL = "initramfs-debug\
     xz \
     tar \
     pv \
-    mmc-utils"
-
+    mmc-utils \
+    wipefs"
 
 # Do not pollute the initrd image with rootfs features
 IMAGE_FEATURES = ""
@@ -37,7 +37,7 @@ MACHINE_FEATURES += "vfat"
 IMAGE_LINGUAS = ""
 
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
-
+IMAGE_FSTYPES += "ext4"
 
 IMAGE_ROOTFS_SIZE = "8192"
 IMAGE_ROOTFS_EXTRA_SPACE = "0"

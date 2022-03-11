@@ -3,22 +3,17 @@
     {
       "id": 1,
       "size_mb": 100,
-      "format": "fat",
+      "format": "fat32",
       "primary": true,
-      "path": "fitImage-iot-edge.bin"
+      "files": ["boot.scr","fitImage-iot-edge.bin"]
     },
     {
       "id": 2,
-      "size_mb": 4000,
-      "format": "ext4",
-      "primary": false,
-      "path": "Colibri-iMX6_iot-edge-node.rootfs.tar.xz"
-    },
-    {
-      "id": 3,
       "fill": true,
       "format": "ext4",
-      "primary": false
+      "primary": false,
+      "files": ["Colibri-iMX6_iot-edge-node.rootfs.tar.xz"],
+      "extract": true
     }
   ]
 }

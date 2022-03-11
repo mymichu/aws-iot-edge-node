@@ -12,11 +12,20 @@ class Partition:
     size_mb: int = 0
     fill: bool = False
     primary: bool = False
-    path: str = ""
+    extract: bool = False
+    files: str = ""
 
     def __repr__(self):
-        rep_string = f"id: {self.id} -- size_mb: {self.size_mb} -- size_mb: {self.format} "
-        rep_string += f" -- primary: {self.primary} -- path: {self.path}"
+        rep_string = f"id: {self.id} -- format: {self.format} "
+        rep_string += f" -- primary: {self.primary} "
+        if self.fill:
+            rep_string += f" -- size_mb: 100%"
+        else:
+            rep_string += f" -- size_mb: {self.size_mb}"
+        if self.files :
+            rep_string += f" -- files: {self.files}"
+        if self.extract:
+            rep_string += f" -- extract: {self.extract}"
         return rep_string
 
     def __gt__(self, other):
@@ -47,4 +56,5 @@ class Settings:
 
     def print_part(self):
         sorted_partition = sorted(self.config.partitions)
-        print(sorted_partition[0])
+        for partition in sorted_partition:
+            print(partition)
